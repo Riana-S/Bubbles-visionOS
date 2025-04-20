@@ -10,24 +10,9 @@
 
 def Xform "Root"
 {
-    reorder nameChildren = ["Sphere", "BubbleMaterial"]
+    reorder nameChildren = ["Bubble", "BubbleMaterial"]
     float3 xformOp:translate = (0, 0.007, -0.005)
     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
-
-    def Sphere "Sphere" (
-        active = true
-        prepend apiSchemas = ["MaterialBindingAPI"]
-    )
-    {
-        rel material:binding = </Root/BubbleMaterial> (
-            bindMaterialAs = "weakerThanDescendants"
-        )
-        double radius = 0.1
-        quatf xformOp:orient = (1, 0, 0, 0)
-        float3 xformOp:scale = (1, 1, 1)
-        float3 xformOp:translate = (0, 0, 0)
-        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
-    }
 
     def Material "BubbleMaterial"
     {
@@ -49,11 +34,19 @@ def Xform "Root"
                 }
             }
         )
+        float inputs:Pop = 0 (
+            customData = {
+                dictionary realitykit = {
+                    float2 positionInSubgraph = (-132.79796, 577.6465)
+                    float2 sizeInSubgraph = (98, 53)
+                }
+            }
+        )
         prepend token outputs:mtlx:surface.connect = </Root/BubbleMaterial/PreviewSurface.outputs:out>
         token outputs:realitykit:vertex
-        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (699.16174, -119.43692)
+        float2 ui:nodegraph:realitykit:subgraphOutputs:pos = (886.59845, -51.771305)
         float2 ui:nodegraph:realitykit:subgraphOutputs:size = (181.5, 99)
-        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 113
+        int ui:nodegraph:realitykit:subgraphOutputs:stackingOrder = 886
 
         def Shader "PreviewSurface"
         {
@@ -67,38 +60,39 @@ def Xform "Root"
             float inputs:ior
             float inputs:metallic
             float3 inputs:normal
-            float inputs:occlusion
+            float inputs:occlusion.connect = </Root/BubbleMaterial/Step.outputs:out>
             float inputs:opacity = 0.15
+            float inputs:opacity.connect = </Root/BubbleMaterial/Remap_1.outputs:out>
             float inputs:opacityThreshold
             float inputs:roughness = 0
             token outputs:out
-            float2 ui:nodegraph:node:pos = (489.017, -104.48967)
+            float2 ui:nodegraph:node:pos = (657.8056, 211.62236)
             float2 ui:nodegraph:node:size = (159.5, 307)
-            int ui:nodegraph:node:stackingOrder = 536
+            int ui:nodegraph:node:stackingOrder = 882
             string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["Advanced"]
         }
 
         def Shader "Add"
         {
             uniform token info:id = "ND_add_color3"
-            color3f inputs:in1.connect = </Root/BubbleMaterial/GenerateColorNoise_1.outputs:Multiply_out>
-            color3f inputs:in2.connect = </Root/BubbleMaterial/GenerateColorNoise.outputs:Multiply_out>
+            color3f inputs:in1.connect = </Root/BubbleMaterial/GenerateColorNoise.outputs:Multiply_out>
+            color3f inputs:in2.connect = </Root/BubbleMaterial/GenerateColorNoise_1.outputs:Multiply_out>
             color3f outputs:out
-            float2 ui:nodegraph:node:pos = (203.33038, -105.8267)
+            float2 ui:nodegraph:node:pos = (165.45648, 23.084097)
             float2 ui:nodegraph:node:size = (61.5, 36.5)
-            int ui:nodegraph:node:stackingOrder = 538
-            string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["outputs:out"]
+            int ui:nodegraph:node:stackingOrder = 593
+            string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["outputs:out", "outputs:out"]
         }
 
         def Shader "Add_4"
         {
             uniform token info:id = "ND_add_color3"
-            color3f inputs:in1.connect = </Root/BubbleMaterial/GenerateColorNoise_2.outputs:Multiply_out>
-            color3f inputs:in2.connect = </Root/BubbleMaterial/Add.outputs:out>
+            color3f inputs:in1.connect = </Root/BubbleMaterial/Add.outputs:out>
+            color3f inputs:in2.connect = </Root/BubbleMaterial/GenerateColorNoise_2.outputs:Multiply_out>
             color3f outputs:out
-            float2 ui:nodegraph:node:pos = (331.46326, 29.950134)
+            float2 ui:nodegraph:node:pos = (285.9737, 263.61844)
             float2 ui:nodegraph:node:size = (61.5, 36.5)
-            int ui:nodegraph:node:stackingOrder = 534
+            int ui:nodegraph:node:stackingOrder = 595
         }
 
         def NodeGraph "GenerateColorNoise"
@@ -509,6 +503,113 @@ def Xform "Root"
                 int ui:nodegraph:node:stackingOrder = 1045
             }
         }
+
+        def Shader "Noise3D"
+        {
+            uniform token info:id = "ND_noise3d_float"
+            float inputs:amplitude
+            float inputs:pivot
+            float3 inputs:position.connect = </Root/BubbleMaterial/Multiply.outputs:out>
+            float outputs:out
+            float2 ui:nodegraph:node:pos = (28.64601, 422.03195)
+            float2 ui:nodegraph:node:size = (105, 145)
+            int ui:nodegraph:node:stackingOrder = 801
+        }
+
+        def Shader "Position"
+        {
+            uniform token info:id = "ND_position_vector3"
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-231.01953, 386.47742)
+            float2 ui:nodegraph:node:size = (133.5, 40)
+            int ui:nodegraph:node:stackingOrder = 801
+        }
+
+        def Shader "Multiply"
+        {
+            uniform token info:id = "ND_multiply_vector3FA"
+            prepend float3 inputs:in1.connect = </Root/BubbleMaterial/Position.outputs:out>
+            float inputs:in2.connect = </Root/BubbleMaterial/PopHoleScale.outputs:out>
+            float3 outputs:out
+            float2 ui:nodegraph:node:pos = (-89.64108, 418.4952)
+            float2 ui:nodegraph:node:size = (60, 36)
+            int ui:nodegraph:node:stackingOrder = 801
+        }
+
+        def Shader "PopHoleScale"
+        {
+            uniform token info:id = "ND_constant_float"
+            float inputs:value = 50
+            float outputs:out
+            float2 ui:nodegraph:node:pos = (-237.31555, 454.55624)
+            float2 ui:nodegraph:node:size = (171.5, 53)
+            int ui:nodegraph:node:stackingOrder = 801
+        }
+
+        def Shader "Step"
+        {
+            uniform token info:id = "ND_realitykit_step_float"
+            float inputs:edge
+            float inputs:in.connect = </Root/BubbleMaterial/Add_1.outputs:out>
+            float outputs:out
+            float2 ui:nodegraph:node:pos = (293.20795, 411.73264)
+            float2 ui:nodegraph:node:size = (129, 127)
+            int ui:nodegraph:node:stackingOrder = 801
+        }
+
+        def Shader "Add_1"
+        {
+            uniform token info:id = "ND_add_float"
+            float inputs:in1.connect = </Root/BubbleMaterial/Noise3D.outputs:out>
+            float inputs:in2.connect = </Root/BubbleMaterial/Remap.outputs:out>
+            float outputs:out
+            float2 ui:nodegraph:node:pos = (149.43529, 520.0054)
+            float2 ui:nodegraph:node:size = (61.5, 36.5)
+            int ui:nodegraph:node:stackingOrder = 810
+        }
+
+        def Shader "Remap"
+        {
+            uniform token info:id = "ND_remap_float"
+            float inputs:in.connect = </Root/BubbleMaterial.inputs:Pop>
+            float inputs:inhigh
+            float inputs:inlow
+            float inputs:outhigh
+            float inputs:outlow = -1
+            float outputs:out
+            float2 ui:nodegraph:node:pos = (18.612947, 602.1062)
+            float2 ui:nodegraph:node:size = (94, 181)
+            int ui:nodegraph:node:stackingOrder = 890
+            string[] ui:nodegraph:realitykit:node:attributesShowingChildren = ["inputs:outlow", "inputs:outlow"]
+        }
+
+        def Shader "Remap_1"
+        {
+            uniform token info:id = "ND_remap_float"
+            float inputs:in.connect = </Root/BubbleMaterial/Step.outputs:out>
+            float inputs:inhigh
+            float inputs:inlow
+            float inputs:outhigh = 0.15
+            float outputs:out
+            float2 ui:nodegraph:node:pos = (475.52582, 149.46323)
+            float2 ui:nodegraph:node:size = (105.5, 181)
+            int ui:nodegraph:node:stackingOrder = 887
+        }
+    }
+
+    def Sphere "Bubble" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        rel material:binding = </Root/BubbleMaterial> (
+            bindMaterialAs = "weakerThanDescendants"
+        )
+        double radius = 0.1
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
     }
 }
 

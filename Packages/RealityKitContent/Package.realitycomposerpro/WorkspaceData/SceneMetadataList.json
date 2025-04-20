@@ -36,8 +36,7 @@
       },
       [
         "526E6332-982C-44B1-958B-9C8E71802936",
-        "Root",
-        "Sphere"
+        "Root"
       ],
       {
         "isExpanded" : true,
@@ -45,7 +44,8 @@
       },
       [
         "526E6332-982C-44B1-958B-9C8E71802936",
-        "Root"
+        "Root",
+        "Bubble"
       ],
       {
         "isExpanded" : true,
