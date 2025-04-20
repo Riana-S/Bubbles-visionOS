@@ -9,6 +9,9 @@ import SwiftUI
 
 @main
 struct BubblesApp: App {
+    init(){
+        BubbleSystem.registerSystem()
+    }
     var body: some Scene {
         WindowGroup {
             ContentView()

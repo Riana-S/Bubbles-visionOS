@@ -18,8 +18,24 @@ struct ImmersiveView: View {
             // Add the initial RealityKit content
             if let scene = try? await Entity(named: "BubbleScene", in: realityKitContentBundle) {
                 bubble = scene.findEntity(named: "Bubble")!
-                for _ in 1...20{
+                for _ in 1...50{
                     var bubbleClone = bubble.clone(recursive: true)
+                    guard var bubbleComponent = bubbleClone.components[BubbleComponent.self] else {return}
+                    bubbleComponent.direction = [
+                        Float.random(in: -1...1),
+                        Float.random(in: -1...1),
+                        Float.random(in: -1...1)
+                    ]
+                    bubbleClone.components[BubbleComponent.self] = bubbleComponent
+                    var pb = PhysicsBodyComponent()
+                    pb.linearDamping = 0
+                    pb.isAffectedByGravity = false
+                    bubbleClone.components[PhysicsBodyComponent.self] = pb
+                    let linearVelX = Float.random(in: -0.05...0.05)
+                    let linearVelY = Float.random(in: -0.05...0.05)
+                    let linearVelZ = Float.random(in: -0.05...0.05)
+                    var pm = PhysicsMotionComponent(linearVelocity: [linearVelX, linearVelY, linearVelZ])
+                    bubbleClone.components[PhysicsMotionComponent.self] = pm
                     let x = Float.random(in: -1.5...1.5)
                     let y = Float.random(in: 1...1.5)
                     let z = Float.random(in: -1.5...1.5)
